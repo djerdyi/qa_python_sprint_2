@@ -47,3 +47,9 @@ class BooksCollector:
     # получаем список Избранных книг
     def get_list_of_favorites_books(self):
         return self.favorites
+
+# collector = BooksCollector()
+# collector.add_new_book('sds')
+# collector.set_book_rating('sds', 1)
+
+# print(collector.get_book_rating('sd'))
