@@ -8,6 +8,7 @@ def collector():
 
     return collector
 
+# Для тестов в словаре должно быть минимум 2 элемента
 @pytest.fixture(scope='session')
 def book_dict():
     book_dict = {
