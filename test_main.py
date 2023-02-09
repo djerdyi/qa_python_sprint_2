@@ -1,81 +1,106 @@
 import pytest
 from main import BooksCollector
 
-# класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
+# Класс TestBooksCollector объединяет набор тестов, которыми мы покрываем наше приложение BooksCollector
 class TestBooksCollector:
 
-    # пример теста:
-    # обязательно указывать префикс test_
-    # дальше идет название метода, который тестируем add_new_book_
-    # затем, что тестируем add_two_books - добавление двух книг
-    def test_add_new_book_add_two_books(self, collector, books_list):
-        # добавляем две книги
-        collector.add_new_book(books_list[0])
-        collector.add_new_book(books_list[1])
+    # Проверяем __init__
+    def test_init_empty_list_and_dict(self):
+        collector = BooksCollector()
 
-        # проверяем, что добавилось именно две
-        # словарь books_rating, который нам возвращает метод get_books_rating, имеет длину 2
+        assert collector.books_rating == {} and collector.favorites == []
+    
+    # Проверяем, что метод возвращает нужный словарь книг
+    def test_get_books_rating_get_book_list(self, collector, book_dict):
+        collector.books_rating = book_dict
+
+        assert collector.get_books_rating() == book_dict
+
+    # Проверяем добавление двух книг
+    def test_add_new_book_add_two_books(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.add_new_book(book_list[1])
+
         assert len(collector.get_books_rating()) == 2
 
-    # напиши свои тесты ниже
-    # чтобы тесты были независимыми в каждом из них создавай отдельный экземпляр класса BooksCollector()
-    def test_add_new_book_add_same_book(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.add_new_book(books_list[0])
+    # Проверяем добавление одной и той же книги
+    def test_add_new_book_add_same_book(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.add_new_book(book_list[0])
 
         assert len(collector.get_books_rating()) == 1
-    
-    def test_set_book_rating_rate_book_not_in_list(self, collector, books_list):
-        collector.set_book_rating(books_list[0], 2)
+
+    # Проверяем установку рейтинга доабавленной книге
+    def test_get_book_rating_get_rating_by_book_name(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.set_book_rating(book_list[0], 7)
         
-        assert collector.get_book_rating(books_list[0]) == None
+        assert collector.get_book_rating(book_list[0]) == 7
 
-    def test_set_book_raiting_set_rating_less_than_one(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.set_book_rating(books_list[0], 0)
+    # Проверяем получение рейтинга книги, которой нет в списке
+    def test_set_book_rating_rate_book_not_in_list(self, collector, book_list):
+        collector.set_book_rating(book_list[0], 2)
+        
+        assert collector.get_book_rating(book_list[0]) == None
 
-        assert collector.get_book_rating(books_list[0]) == 1
+    # Проверяем, что нельза задать рейтинг < 1
+    def test_set_book_rating_set_rating_less_than_one(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.set_book_rating(book_list[0], 0)
 
-    def test_set_book_raiting_set_rating_more_than_ten(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.set_book_rating(books_list[0], 11)
+        assert collector.get_book_rating(book_list[0]) == 1
 
-        assert collector.get_book_rating(books_list[0]) == 1
+    # Проверяем, что нельзя задать рейтинг > 10
+    def test_set_book_rating_set_rating_more_than_ten(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.set_book_rating(book_list[0], 11)
 
-    def test_get_book_raiting_get_rating_of_missing_book(self, collector, books_list):
-
-        assert collector.get_book_rating(books_list[0]) == None
+        assert collector.get_book_rating(book_list[0]) == 1
     
-    def test_add_book_in_favorites_add_two_books(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.add_new_book(books_list[1])
-        collector.add_book_in_favorites(books_list[0])
-        collector.add_book_in_favorites(books_list[1])
+    # Проверяем, что у не добавленной книги нет рейтинга
+    def test_get_book_rating_get_rating_of_missing_book(self, collector, book_list):
+
+        assert collector.get_book_rating(book_list[0]) == None
+    
+    # Проверяем получение списка книг по указанному рейтингу
+    def test_get_books_with_specific_rating_get_book_by_rating(self, collector, book_list, book_dict):
+        collector.books_rating = book_dict
+        rating = book_dict.get(book_list[1])
+        count_books_with_rating = 0
+        for value in book_dict.values():
+            if value == rating:
+                count_books_with_rating += 1
+                
+        assert len(collector.get_books_with_specific_rating(rating)) == count_books_with_rating
+    
+    # Проверяем добавление двух книг в избранное
+    def test_add_book_in_favorites_add_two_books(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.add_new_book(book_list[1])
+        collector.add_book_in_favorites(book_list[0])
+        collector.add_book_in_favorites(book_list[1])
 
         assert len(collector.get_list_of_favorites_books()) == 2
 
-    def test_add_book_in_favorites_add_book_not_from_books_rating(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.add_new_book(books_list[1])
-        collector.add_book_in_favorites(books_list[2])
+    # Проверяем, что нельзя добавить книгу в избранное, если её нет в основном списке
+    def test_add_book_in_favorites_add_book_not_from_books_rating(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.add_new_book(book_list[1])
+        collector.add_book_in_favorites(book_list[2])
 
         assert len(collector.get_list_of_favorites_books()) == 0
-
-    def test_delete_book_from_favorites_delete_book(self, collector, books_list):
-        collector.add_new_book(books_list[0])
-        collector.add_book_in_favorites(books_list[0])
-        collector.delete_book_from_favorites(books_list[0])
+    
+    # Проверяем удаление книги из избранного
+    def test_delete_book_from_favorites_delete_book(self, collector, book_list):
+        collector.add_new_book(book_list[0])
+        collector.add_book_in_favorites(book_list[0])
+        collector.delete_book_from_favorites(book_list[0])
 
         assert len(collector.get_list_of_favorites_books()) == 0
-
-# Проверка добавления книг. +
-# Нельзя добавить одну и ту же книгу дважды. +
-# Нельзя выставить рейтинг книге, которой нет в списке. +
-# Нельзя выставить рейтинг меньше 1. +
-# Нельзя выставить рейтинг больше 10. +
-# У не добавленной книги нет рейтинга. +
-# Добавление книги в избранное. +
-# Нельзя добавить книгу в избранное, если её нет в словаре books_rating. +
-# Проверка удаления книги из избранного. +
 
 # Ожидаемы результат в имени тестов?
+# Что-то делаю не так? IDE не подтягивает методы и параметры объекта, переданного в функцию и созданного фикстурой.
+
+# пример теста:
+# обязательно указывать префикс test_
+# дальше идет название метода, который тестируем add_new_book_
