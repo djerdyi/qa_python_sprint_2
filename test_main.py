@@ -73,8 +73,8 @@ class TestBooksCollector:
     # Проверяем получение списка книг по указанному рейтингу
     def test_get_books_with_specific_rating_get_book_by_rating(self, collector, book_list, book_dict):
         collector.books_rating = book_dict
-        book_number_in_list = random.randint(0,len(book_list) - 1)
-        rating = book_dict.get(book_list[book_number_in_list])
+        random_book_number_in_list = random.randint(0, len(book_list) - 1)
+        rating = book_dict.get(book_list[random_book_number_in_list])
         count_books_with_rating = 0
         for value in book_dict.values():
             if value == rating:
